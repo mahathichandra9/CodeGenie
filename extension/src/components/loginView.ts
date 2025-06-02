@@ -72,7 +72,7 @@
 
 
 import * as vscode from "vscode";
-import { getLoginPageContent } from "../templates/loginTemplate";
+import { getLoginPageContent } from "../pages/loginPage";
 import { getLoginSuccessAnimation } from "../resources/getLoginSuccessAnimation";
 
 export function showLoginPage(extensionUri: vscode.Uri) {

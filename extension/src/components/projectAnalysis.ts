@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { analyzeProject } from "../services/projectAnalysisService";
-import { generateProjectAnalysisContent } from "../templates/projectAnalysisTemplate";
+import { analyzeProject } from "../services/apiService";
+import { generateProjectAnalysisContent } from "../pages/projectAnalysisPage";
 import { getLoadingAnimation } from "../resources/getLoadingAnimation";
 import { getErrorContent } from "../resources/getErrorContent";
 

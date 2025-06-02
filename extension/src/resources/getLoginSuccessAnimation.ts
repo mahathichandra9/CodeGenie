@@ -286,7 +286,7 @@ export function getLoginSuccessAnimation(title: string, username: string): strin
         </div>
         <div class="success-card">
             <h2>Login Successful</h2>
-            <p>Logged in as: <strong>${username}</strong></p>
+            <p>Logged in as: <strong>kmit</strong></p>
         </div>
     </div>
     <script>
