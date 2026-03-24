@@ -1,4 +1,4 @@
-#  CodeGenie - AI-Powered Coding Assistant for VS Code 💻
+#  CodeGenie - AI-Powered Coding Assistant for VS Code 
 
 ## 🚀 Introduction  
 CodeGenie is an AI-powered coding assistant integrated into Visual Studio Code that enhances developer productivity through real-time code generation, intelligent suggestions, and automated code transformations.  
