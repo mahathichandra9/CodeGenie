@@ -27,7 +27,7 @@ Powered by DeepSeek Coder, CodeGenie helps developers write faster, reduce error
 ## 🏗️ System Architecture  
 
 <p align="center">
-  <img src="codegenie arc.jpg" width="700"/>
+  <img src="images/codegenie arc.jpg" width="700"/>
 </p>
 
 The system consists of three main components:  
@@ -40,7 +40,7 @@ The system consists of three main components:
 ## 🔄 Workflow  
 
 <p align="center">
-  <img src="codegenie workflow.png" width="700"/>
+  <img src="images/codegenie workflow.png" width="700"/>
 </p>
 
 User Input (comments/code) → Extension → Flask API → AI Model → Processed Output → Display in VS Code  
