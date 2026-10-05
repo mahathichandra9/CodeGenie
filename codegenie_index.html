@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CodeGenie — AI Pair Programmer</title>
+<style>
+  :root{
+    --ink:#14161a; --sub:#5b6270; --bg:#ffffff; --bg-soft:#f6f7fb;
+    --line:#e7e9f0; --accent:#5b4bff; --accent-ink:#ffffff; --accent-soft:#f0eeff;
+    --good:#0e8a5f; --warn:#a15c00;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); line-height:1.55;}
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+  header.nav{border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(255,255,255,.92); backdrop-filter:blur(6px); z-index:10;}
+  .nav .wrap{display:flex; align-items:center; justify-content:space-between; height:68px;}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; letter-spacing:-.01em;}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#7a6bff,#4636e0); display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;}
+  .nav-links{display:flex; gap:28px; font-size:14.5px; color:var(--sub);}
+  .nav-links a{text-decoration:none;}
+  .cta-btn{background:var(--accent); color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:600; font-size:14.5px; text-decoration:none; display:inline-block;}
+  .cta-btn.ghost{background:transparent; color:var(--accent); border:1.5px solid var(--accent);}
+
+  .hero{padding:76px 0 56px; background:linear-gradient(180deg,#fbfaff 0%, #ffffff 65%);}
+  .hero .wrap{display:grid; grid-template-columns:1.1fr .9fr; gap:48px; align-items:center;}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; background:var(--accent-soft); color:var(--accent); font-size:12.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:6px 12px; border-radius:999px; margin-bottom:18px;}
+  h1{font-size:44px; line-height:1.1; letter-spacing:-.02em; margin:0 0 18px;}
+  h1 span{color:var(--accent);}
+  .lede{font-size:18px; color:var(--sub); margin:0 0 28px; max-width:52ch;}
+  .hero-ctas{display:flex; gap:12px; margin-bottom:22px;}
+  .hero-note{font-size:13px; color:var(--sub);}
+  .hero-visual{background:var(--bg-soft); border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 20px 45px -25px rgba(30,20,90,.35);}
+  .editor{background:#1c1d27; border-radius:10px; overflow:hidden; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; color:#d8dae8;}
+  .editor .bar{display:flex; gap:6px; padding:10px 12px; background:#15161e;}
+  .editor .bar span{width:10px;height:10px;border-radius:50%;}
+  .editor .bar span:nth-child(1){background:#ff5f56;} .editor .bar span:nth-child(2){background:#ffbd2e;} .editor .bar span:nth-child(3){background:#27c93f;}
+  .editor .body{padding:16px 18px;}
+  .editor .cm{color:#8b90a8;}
+  .editor .kw{color:#c792ea;}
+  .editor .fn{color:#82aaff;}
+  .editor .str{color:#c3e88d;}
+  .editor .sugg{margin-top:10px; background:#262838; border:1px solid #3a3d52; border-radius:8px; padding:9px 11px; color:#a6adcf;}
+  .editor .sugg b{color:#82aaff;}
+
+  section{padding:64px 0;}
+  .section-head{max-width:640px; margin:0 auto 40px; text-align:center;}
+  .section-head h2{font-size:30px; letter-spacing:-.01em; margin:0 0 12px;}
+  .section-head p{color:var(--sub); font-size:16px; margin:0;}
+
+  .stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:8px;}
+  .stat-card{background:var(--bg-soft); border:1px solid var(--line); border-radius:14px; padding:24px;}
+  .stat-card .num{font-size:32px; font-weight:800; color:var(--accent); letter-spacing:-.02em;}
+  .stat-card .lbl{font-size:14px; color:var(--sub); margin-top:6px;}
+  .cite{font-size:12px; color:#8a90a0; margin-top:22px; text-align:center;}
+
+  .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .feat-card{border:1px solid var(--line); border-radius:14px; padding:22px; background:#fff;}
+  .feat-card .ico{width:38px;height:38px;border-radius:10px;background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:14px; font-weight:700;}
+  .feat-card h3{font-size:16px; margin:0 0 8px;}
+  .feat-card p{font-size:14px; color:var(--sub); margin:0;}
+
+  .arch{background:var(--bg-soft); border:1px solid var(--line); border-radius:16px; padding:32px;}
+  .arch-row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .arch-step{flex:1; min-width:140px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; text-align:center;}
+  .arch-step .n{width:26px;height:26px;border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; margin:0 auto 10px;}
+  .arch-step h4{font-size:13.5px; margin:0 0 4px;}
+  .arch-step p{font-size:12px; color:var(--sub); margin:0;}
+  .arrow{color:#c4c8d6; font-size:20px;}
+
+  table.compare{width:100%; border-collapse:collapse; font-size:14px;}
+  table.compare th, table.compare td{padding:14px 16px; border-bottom:1px solid var(--line); text-align:left;}
+  table.compare th{color:var(--sub); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:.02em;}
+  table.compare td.yes{color:var(--good); font-weight:700;}
+  table.compare td.no{color:#b0b4c0;}
+  table.compare tr td:first-child{font-weight:600;}
+  .col-highlight{background:var(--accent-soft);}
+
+  .pricing-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .plan{border:1px solid var(--line); border-radius:16px; padding:28px; background:#fff;}
+  .plan.featured{border-color:var(--accent); box-shadow:0 20px 40px -28px rgba(91,75,255,.55); position:relative;}
+  .plan.featured::before{content:"Most likely tier"; position:absolute; top:-12px; left:24px; background:var(--accent); color:#fff; font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px;}
+  .plan h3{margin:0 0 4px; font-size:18px;}
+  .plan .price{font-size:30px; font-weight:800; margin:10px 0 4px;}
+  .plan .price small{font-size:14px; font-weight:500; color:var(--sub);}
+  .plan .who{font-size:13px; color:var(--sub); margin-bottom:16px;}
+  .plan ul{list-style:none; padding:0; margin:0; font-size:13.5px; color:#3a3d4a;}
+  .plan li{padding:7px 0; border-top:1px solid #f0f1f6;}
+  .plan li:first-child{border-top:none;}
+
+  .roadmap{display:flex; gap:16px; overflow-x:auto; padding-bottom:6px;}
+  .rm-item{min-width:220px; border:1px solid var(--line); border-radius:14px; padding:18px; background:var(--bg-soft);}
+  .rm-item .tag{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.03em;}
+  .rm-item h4{margin:8px 0 6px; font-size:14.5px;}
+  .rm-item p{margin:0; font-size:13px; color:var(--sub);}
+
+  .cta-band{background:linear-gradient(135deg,#4636e0,#7a6bff); border-radius:20px; padding:48px; text-align:center; color:#fff;}
+  .cta-band h2{margin:0 0 12px; font-size:28px;}
+  .cta-band p{margin:0 0 24px; opacity:.9;}
+  .cta-band .cta-btn{background:#fff; color:var(--accent);}
+  .cta-band .cta-btn.ghost{background:transparent; border-color:#fff; color:#fff;}
+
+  footer{border-top:1px solid var(--line); padding:34px 0; color:var(--sub); font-size:13px;}
+  footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+  .note-band{background:#fff8ec; border:1px solid #f0d9a8; border-radius:12px; padding:16px 20px; font-size:13px; color:#7a5a12; margin-top:18px;}
+
+  @media(max-width:860px){
+    .hero .wrap{grid-template-columns:1fr;}
+    .stat-row, .feat-grid, .pricing-grid{grid-template-columns:1fr;}
+    h1{font-size:32px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand"><div class="mark">CG</div> CodeGenie</div>
+    <nav class="nav-links">
+      <a href="#problem">Why It Exists</a>
+      <a href="#product">Product</a>
+      <a href="#how">How It Works</a>
+      <a href="#compare">Positioning</a>
+      <a href="#pricing">Pricing Model</a>
+    </nav>
+    <a class="cta-btn ghost" href="https://github.com/mahathichandra9/CodeGenie" target="_blank">View on GitHub</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">● AI Developer Tools</div>
+      <h1>The AI pair programmer that <span>runs on your own infrastructure.</span></h1>
+      <p class="lede">CodeGenie brings natural-language code generation, intelligent autocomplete, and automated bug detection into VS Code — powered by a self-hosted model instead of a third-party cloud API.</p>
+      <div class="hero-ctas">
+        <a class="cta-btn" href="https://github.com/mahathichandra9/CodeGenie" target="_blank">See the Build →</a>
+        <a class="cta-btn ghost" href="#product">Explore the Product</a>
+      </div>
+      <div class="hero-note">Built solo · DeepSeek Coder 1.3B · Flask backend · GPU-accelerated inference</div>
+    </div>
+    <div class="hero-visual">
+      <div class="editor">
+        <div class="bar"><span></span><span></span><span></span></div>
+        <div class="body">
+          <div class="cm">// generate: function to validate an email address</div>
+          <div><span class="kw">function</span> <span class="fn">validateEmail</span>(email) {</div>
+          <div>&nbsp;&nbsp;<span class="kw">const</span> re = <span class="str">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>;</div>
+          <div>&nbsp;&nbsp;<span class="kw">return</span> re.test(email);</div>
+          <div>}</div>
+          <div class="sugg"><b>CodeGenie ▸</b> Suggests adding a max-length guard and unit tests. Apply?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Most developer time isn't spent writing new code</h2>
+      <p>It's spent maintaining, debugging, translating, and re-explaining code that already exists — the exact surface area CodeGenie targets first.</p>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="num">~30%</div><div class="lbl">of developer time goes to maintenance, debugging, and legacy-code upkeep rather than new features</div></div>
+      <div class="stat-card"><div class="num">4</div><div class="lbl">repetitive workflows CodeGenie automates today: generation, translation, bug-scanning, summarization</div></div>
+      <div class="stat-card"><div class="num">100%</div><div class="lbl">of inference runs on infrastructure the team controls — no code leaves the machine</div></div>
+    </div>
+    <p class="cite">Maintenance-time figure: SonarSource developer survey, "Developers spend 30% of their time on code maintenance." Used here as industry context, not a CodeGenie-specific measurement.</p>
+  </div>
+</section>
+
+<section id="product" style="background:var(--bg-soft);">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What CodeGenie does</h2>
+      <p>Six capabilities, built around one idea: keep the developer in flow instead of context-switching to search engines, docs, or a second tool.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="ico">⌘</div><h3>Comment-to-code generation</h3><p>Turns a natural-language comment into working code directly inside the editor.</p></div>
+      <div class="feat-card"><div class="ico">⇢</div><h3>Context-aware autocomplete</h3><p>Suggestions informed by the surrounding file and project, not just the current line.</p></div>
+      <div class="feat-card"><div class="ico">⇄</div><h3>Cross-language translation</h3><p>Converts code between languages — useful for teams migrating stacks or onboarding polyglot engineers.</p></div>
+      <div class="feat-card"><div class="ico">⚑</div><h3>Bug &amp; vulnerability flagging</h3><p>Surfaces likely defects and security issues before they reach review.</p></div>
+      <div class="feat-card"><div class="ico">↯</div><h3>Optimization suggestions</h3><p>Flags inefficient patterns and proposes cleaner, faster alternatives.</p></div>
+      <div class="feat-card"><div class="ico">▤</div><h3>Project-level summarization</h3><p>Generates a working summary of a codebase — useful for onboarding and handovers.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>How it works</h2>
+      <p>A lightweight pipeline designed to keep latency low enough to feel native inside the editor.</p>
+    </div>
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-step"><div class="n">1</div><h4>Developer intent</h4><p>Comment, selection, or command inside VS Code</p></div>
+        <div class="arrow">→</div>
+        <div class="arch-step"><div class="n">2</div><h4>Extension layer</h4><p>Captures context, sends request to backend</p></div>
+        <div class="arrow">→</div>
+        <div class="arch-step"><div class="n">3</div><h4>Flask API</h4><p>Routes request, manages session context</p></div>
+        <div class="arrow">→</div>
+        <div class="arch-step"><div class="n">4</div><h4>DeepSeek Coder (GPU)</h4><p>Generates code, explanations, or fixes</p></div>
+        <div class="arrow">→</div>
+        <div class="arch-step"><div class="n">5</div><h4>Editor output</h4><p>Inline suggestion, diff, or autocomplete</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="compare" style="background:var(--bg-soft);">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Where CodeGenie sits in the market</h2>
+      <p>Positioned against category leaders to clarify the actual differentiation — infrastructure and cost, not raw model capability.</p>
+    </div>
+    <table class="compare">
+      <tr><th></th><th>GitHub Copilot</th><th>Cursor</th><th class="col-highlight">CodeGenie</th></tr>
+      <tr><td>Model hosting</td><td class="no">Cloud (OpenAI)</td><td class="no">Cloud (multiple)</td><td class="yes">Self-hosted, on your GPU</td></tr>
+      <tr><td>Code leaves the network</td><td class="no">Yes</td><td class="no">Yes</td><td class="yes">No</td></tr>
+      <tr><td>Marginal cost per seat</td><td class="no">Per-seat subscription</td><td class="no">Per-seat subscription</td><td class="yes">Compute cost only, no per-seat fee</td></tr>
+      <tr><td>Best fit</td><td>General developers</td><td>General developers</td><td class="yes">Privacy-sensitive &amp; cost-sensitive teams (healthcare, legal, fintech, students)</td></tr>
+    </table>
+    <p class="cite">Comparison reflects CodeGenie's architecture (self-hosted DeepSeek Coder) versus the publicly known hosting models of Copilot and Cursor. Not an independent benchmark of output quality.</p>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>A monetization model worth designing for</h2>
+      <p>CodeGenie hasn't been commercialized — but the architecture supports a straightforward path, sketched below as a product-thinking exercise.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan">
+        <h3>Individual</h3>
+        <div class="price">Free</div>
+        <div class="who">Students &amp; solo developers running locally</div>
+        <ul><li>Full feature set</li><li>Local/self-hosted only</li><li>Community support</li></ul>
+      </div>
+      <div class="plan featured">
+        <h3>Team</h3>
+        <div class="price">$/GPU-hour <small>+ small seat fee</small></div>
+        <div class="who">Small teams wanting private, on-prem code AI</div>
+        <ul><li>Shared self-hosted deployment</li><li>Usage &amp; suggestion analytics</li><li>Priority support</li></ul>
+      </div>
+      <div class="plan">
+        <h3>Enterprise</h3>
+        <div class="price">Custom</div>
+        <div class="who">Regulated industries: healthcare, legal, finance</div>
+        <ul><li>Fully air-gapped deployment</li><li>Compliance &amp; audit logging</li><li>Dedicated onboarding</li></ul>
+      </div>
+    </div>
+    <div class="note-band">This pricing structure is a design exercise, not a live commercial offering — CodeGenie has not been commercialised. It illustrates how the underlying architecture (self-hosted inference) naturally translates into a compute-cost pricing model rather than the per-seat model competitors use.</div>
+  </div>
+</section>
+
+<section style="background:var(--bg-soft);">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What's next</h2>
+      <p>Roadmap as documented in the project repository.</p>
+    </div>
+    <div class="roadmap">
+      <div class="rm-item"><div class="tag">Distribution</div><h4>VS Code Marketplace listing</h4><p>Move from local install to one-click publish.</p></div>
+      <div class="rm-item"><div class="tag">Reach</div><h4>Multilingual support</h4><p>Expand beyond the current language set.</p></div>
+      <div class="rm-item"><div class="tag">Interaction</div><h4>Voice interface</h4><p>Hands-free comment-to-code generation.</p></div>
+      <div class="rm-item"><div class="tag">Scale</div><h4>Cloud-optional deployment</h4><p>Give teams a choice between self-hosted and managed.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Built to explore where AI tooling and developer economics meet</h2>
+      <p>CodeGenie started as a technical build — and became a lens into how infrastructure choices become business choices.</p>
+      <a class="cta-btn" href="https://github.com/mahathichandra9/CodeGenie" target="_blank">View the Repository</a>
+      <a class="cta-btn ghost" href="#product">Back to Product Overview</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>CodeGenie — built by Mahathi Chandra Peddinti · B.Tech CSE, Keshav Memorial Institute of Technology</div>
+    <div>github.com/mahathichandra9/CodeGenie</div>
+  </div>
+</footer>
+
+</body>
+</html>
